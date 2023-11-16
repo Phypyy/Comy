@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        * {
+            background-color: #2C2C2C;
+            font-family: Sarabun;
+        }
+        
+        body {
+            margin: 16px;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .option {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .textarea {
+            resize: none;
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #444444;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: #fff;
+            font-size: 14px;
+            font-weight: 500px;
+            line-height: 20px;
+            color: #2C2C2C;
+        }
+        
+        .textarea::placeholder {
+            color: #CACACA;
+        }
+        
+        .textarea:focus {
+            outline-color: #2C2C2C;
+        }
+        
+        .button {
+            padding: 8px 16px;
+            background-color: #2C2C2C;
+            color: #fff;
+            border: 1px solid #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+        
+        .button:hover {
+            background-color: #fff;
+            color: #2C2C2C;
+        }
+        
+        .button:disabled {
+            pointer-events: none;
+            color: #444444;
+            border-color: #444444;
+        }
+        
+        .button:hover:disabled {
+            pointer-events: none;
+            background-color: #2C2C2C;
+            color: #444444;
+        }
+        
+        .color-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+        
+        .color-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-right: 16px;
+            cursor: pointer;
+        }
+        
+        .color-option input {
+            display: none;
+        }
+        
+        .color-option .color-circle {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        
+        .color-option.selected .color-circle {
+            box-shadow: inset 0 0 0 2px #2C2C2C, 0 0 0 1px #fff;
+        }
+        
+        .color-option input:checked+.color-circle {
+            box-shadow: inset 0 0 0 2px #2C2C2C, 0 0 0 1px #fff;
+        }
+        
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            margin-left: auto;
+        }
+        
+        .dropdown-select {
+            appearance: none;
+            background-color: #2C2C2C;
+            border: none;
+            border-bottom: 1px solid #444444;
+            border-radius: 0;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 400;
+            color: #fff;
+            cursor: pointer;
+        }
+        
+        .dropdown-select:focus,
+        .dropdown:hover .dropdown-select {
+            outline-color: #2C2C2C;
+            background-color: #2C2C2C;
+            color: #fff;
+            outline-style: none;
+        }
+        /* Dropdown arrow styles */
+        
+        .dropdown-select::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 4px solid #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="option">
+            <div class="color-container">
+                <label class="color-option">
+                <input type="radio" name="color" value="1, 0.8667, 0.3922" checked>
+                <div class="color-circle" style="background-color: #FFDD64;"></div>
+            </label>
+                <label class="color-option">
+                <input type="radio" name="color" value="0.6824, 1, 0.4353">
+                <div class="color-circle" style="background-color: #AEFF6F;"></div>
+            </label>
+                <label class="color-option">
+                <input type="radio" name="color" value="0.4902, 0.7843, 0.9961">
+                <div class="color-circle" style="background-color: #7DC8FE;"></div>
+            </label>
+                <label class="color-option">
+                <input type="radio" name="color" value="1, 0.6196, 0.4039">
+                <div class="color-circle" style="background-color: #FF9E67;"></div>
+            </label>
+                <label class="color-option">
+                <input type="radio" name="color" value="1, 0.5098, 0.5098">
+                <div class="color-circle" style="background-color: #FF8282;"></div>
+            </label>
+            </div>
+            <div class="dropdown">
+                <select class="dropdown-select" id="fontsize">
+            <option value="12">12px</option>
+            <option value="16" selected>16px</option>
+            <option value="20">20px</option>
+            <option value="24">24px</option>
+            <option value="32">32px</option>
+            <option value="48">48px</option>
+            <option value="72">72px</option>
+          </select>
+            </div>
+        </div>
+        <textarea class="textarea" name="comment" id="comment" cols="10" rows="5" placeholder="Comment here!"></textarea>
+        <button class="button" id="submit" disabled>Submit</button>
+    </div>
+    <script>
+        const commentTextarea = document.getElementById('comment');
+        const submitButton = document.getElementById('submit');
+        const colorOptions = document.querySelectorAll('.color-option');
+        const fontSizeSelect = document.getElementById('fontsize');
+
+        function submitComment() {
+            const comment = commentTextarea.value.trim();
+            const selectedColor = document.querySelector('input[name="color"]:checked').value.split(',').map(parseFloat);
+            const selectedFontSize = fontSizeSelect.value;
+            parent.postMessage({
+                pluginMessage: {
+                    type: 'submitComment',
+                    comment,
+                    color: {
+                        r: selectedColor[0],
+                        g: selectedColor[1],
+                        b: selectedColor[2]
+                    },
+                    fontSize: selectedFontSize
+                }
+            }, '*');
+        }
+
+        function checkTextarea() {
+            const comment = commentTextarea.value.trim();
+            if (comment === '') {
+                submitButton.disabled = true;
+            } else {
+                submitButton.disabled = false;
+            }
+        }
+
+        commentTextarea.addEventListener('input', checkTextarea);
+        submitButton.addEventListener('click', submitComment);
+    </script>
+</body>
+
+</html>
